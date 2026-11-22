@@ -4,6 +4,8 @@ GOS (Green Operating System) is a small hobby operating system written from scra
 
 The interface is modeled after classic Mac OS System 6. GOS is not affiliated with Apple.
 
+![gos screenshot](docs/gos.png)
+
 Current version: 0.6
 
 ## What it has
