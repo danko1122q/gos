@@ -149,6 +149,7 @@ void kmain(void) {
 
         int d = desktop_take_dirty();
         if (d) {
+            cursor_hide();
             if (d & DIRTY_SCENE) desktop_render();
             video_compose();
             draw_set_target(video_back());

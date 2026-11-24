@@ -8,6 +8,7 @@
 static const char *names[] = { "?", "Undefined instruction", "Software interrupt", "Prefetch abort", "Data abort", "IRQ" };
 
 static void show(const char *l[], int n) {
+    if (!video_back()) return;   /* panic before video_buffers_init(): back is NULL, drawing would overwrite low RAM (the kernel itself) */
     draw_set_target(video_back()); draw_noclip();
     draw_rect(0, 0, 640, 480, C_BLU);
     text_draw(24, 24, "*** GOS KERNEL PANIC ***", C_WHT, -1);
@@ -34,7 +35,7 @@ void panic_exception(Regs *r) {
 }
 
 void kpanic(const char *fmt, ...) {
-    char b[100]; const char *l[1] = { b };
+    char b[192]; const char *l[1] = { b };
     va_list ap; va_start(ap, fmt);
     kvsnprintf(b, sizeof b, fmt, ap);
     va_end(ap);

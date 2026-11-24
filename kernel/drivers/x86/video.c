@@ -24,12 +24,13 @@ void video_init(void) {
     pitch = fb_pitch;
 }
 
+/* One RAM buffer only: the desktop is rendered into `back` and the cursor is drawn on top of it
+ * with save-under (see gfx/cursor.c). video_scene() is kept as an alias so gui code is unchanged. */
 int video_buffers_init(void) {
-    u32 p = pmm_alloc_contig(2 * VBUF_FRAMES);
+    u32 p = pmm_alloc_contig(VBUF_FRAMES);
     if (!p) return -1;
-    memset((void *)p, 0, 2 * VBUF_FRAMES * 4096u);
-    back = (u8 *)p;
-    scene = (u8 *)(p + VBUF_FRAMES * 4096u);
+    memset((void *)p, 0, VBUF_FRAMES * 4096u);
+    back = scene = (u8 *)p;
     return 0;
 }
 
@@ -40,7 +41,7 @@ void video_set_palette(int i, int r, int g, int b) {
 u8 *video_scene(void) { return scene; }
 u8 *video_back(void)  { return back; }
 
-void video_compose(void) { blit32(back, scene, SCREEN_W * SCREEN_H / 4); }
+void video_compose(void) { /* scene == back on x86: nothing to copy */ }
 
 void video_flip(void) {
     for (int y = 0; y < SCREEN_H; y++) blit32(fb + y * pitch, back + y * SCREEN_W, SCREEN_W / 4);

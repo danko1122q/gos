@@ -47,9 +47,10 @@ int video_buffers_init(void) {
     u32 p = pmm_alloc_contig(VIDEO_NBUF * VBUF_FRAMES);
     if (!p) return -1;
     memset((void *)p, 0, VIDEO_NBUF * VBUF_FRAMES * 4096u);
-    back = (u8 *)p;
-    scene = back + VBUF_FRAMES * 4096u;
-    fb = scene + VBUF_FRAMES * 4096u;
+    /* Two RAM buffers: `back` (desktop + cursor, see gfx/cursor.c) and `fb` (scanned out by the CLCD).
+     * video_scene() is an alias of `back`, so there is no separate scene buffer. */
+    back = scene = (u8 *)p;
+    fb = back + VBUF_FRAMES * 4096u;
     return 0;
 }
 
@@ -70,7 +71,7 @@ static void copy32(void *dst, const void *src, u32 dwords) {
     while (dwords--) *d++ = *s++;
 }
 
-void video_compose(void) { copy32(back, scene, VBUF_BYTES / 4); }
+void video_compose(void) { /* scene == back: nothing to copy */ }
 void video_flip(void) {
     if (!lcd_on && fb) lcd_enable();
     copy32(fb, back, VBUF_BYTES / 4);
